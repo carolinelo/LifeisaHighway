@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <style>
+      #map {
+        height: 600px;  
+        width: 100%;  
+       }
+    </style>
+  </head>
+  <body>
+    <h3>Caroline's Improved Google Maps Demo</h3>
+    <br>
+    <div id="map"></div>
+    <script type="text/javascript" src= "dijkstra_try.js"></script>
+    <script>
+
+function initMap() {
+
+  var t0 = performance.now()
+ 
+  var oregon = {lat: 44.299850, lng: -120.834465};
+  
+  let map = new google.maps.Map(document.getElementById('map'), 
+    {zoom: 7, 
+      center: oregon, 
+      mapTypeID: 'terrain'})
+
+  let instance = new WayPoints()
+  let answer = instance.dijkstras()
+  console.log("Program took " + answer[1] + " ms to first rech destination")
+  if (answer[0] == undefined) {
+    console.log("no path from source to sink")
+
+
+    for (k = 0; k < 5321; k++) {
+      var path_seg = instance.get_unsuc_path(k)
+      //console.log(path_seg)
+
+      if (k == 0) {
+        //console.log("index is: " + index)
+        //console.log(path_seg[index])
+        let marker = new google.maps.Marker({
+          map: map,
+          position: path_seg[0]
+        });
+      }
+      var draw_path = new google.maps.Polyline({
+        path : path_seg,
+        geodesic: true,
+        strokeColor: '#000000',
+        strokeOpacity: 1.0,
+        strokeWeight : 2})
+
+      draw_path.setMap(map)
+    }
+
+    let marker = new google.maps.Marker({
+      map: map,
+      position: instance.get_st("t")
+    })
+  }
+
+  else {
+    console.log("the min distance is: " + answer[0])
+    for (k = 0; k < 5321; k++) {
+      var wrong_path_seg = instance.get_unsuc_path(k)
+
+      var draw_other_path = new google.maps.Polyline({
+        path: wrong_path_seg,
+        geodesic: true,
+        strokeColor: '#000000',
+        strokeOpacity: 0.8,
+        strokeWeight: 1
+      })
+
+      draw_other_path.setMap(map)
+    }
+    var path_seg = instance.get_op_path()
+    var draw_path = new google.maps.Polyline({
+      path: path_seg,
+      geodesic: true,
+      strokeColor: '#FF0000',
+      strokeOpacity: 1.0,
+      strokeWeight: 3
+    })
+
+    draw_path.setMap(map)
+
+    let marker2 = new google.maps.Marker({
+      map: map,
+      position: instance.get_st("s")
+    })
+    let marker3 = new google.maps.Marker({
+      map: map,
+      position: instance.get_st("t")
+    })
+
+    var t1 = performance.now()
+    console.log("Program took " + (t1 - t0) + " milliseconds.") 
+  }
+}
+
+    </script>
+    <script async defer
+    src="https://maps.googleapis.com/maps/api/js?key=AIzaSyBa3E2eSNRb8gJL_gR40ViOHkk6KClzC1I&callback=initMap">
+    </script>
+  </body>
+</html>
